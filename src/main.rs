@@ -1,33 +1,5 @@
 use std::io;
 
-struct UserDefinition {
-    first_name: String,
-    last_name: String,
-    male: String,
-    age: u8,
-    is_blank: bool
-}
-
-
-struct Commands {
-    user_create: String,
-    user_update: String,
-    user_info: String,
-    coomands: String,
-    exit: String 
-}
-
-
-fn set_application_commands() -> Commands {
-     Commands {
-        user_create: String::from("CREATE"),
-        user_update: String::from("UPDATE"),
-        user_info: String::from("INFO"),
-        coomands: String::from("COMMANDS"),
-        exit: String::from("EXIT")
-    }
-}
-
 
 fn get_user_input() -> (String, String, String, String) {
     let mut first_name: String = String::new();
@@ -59,77 +31,125 @@ fn get_user_input() -> (String, String, String, String) {
 }
 
 
-fn get_list_commands(commands: &Commands) {
-    println!("Create User command: {}", commands.user_create);
-    println!("Update User command: {}", commands.user_update);
-    println!("Ger User info command: {}", commands.user_info);
-    println!("Get List Commands command: {}", commands.coomands);
-    println!("Shut down Application command {}", commands.exit);
+struct UserDefinition {
+    first_name: String,
+    last_name: String,
+    male: String,
+    age: u8,
+    is_blank: bool
 }
 
-fn create_user() -> UserDefinition {
- 
-    let (first_name, last_name, male, age) = get_user_input();
 
-    let age: u8 = age.trim().parse().expect("Wrong number");
+impl UserDefinition { 
+    fn create_user(&mut self) {
+        
+        if self.is_blank == false {
+            println!("User already created");
+            return;
+        }
 
-    println!("User was created");
+        let (first_name, last_name, male, age) = get_user_input();
 
-    return UserDefinition {
-        first_name: first_name,
-        last_name: last_name,
-        male: male,
-        age: age,
-        is_blank: false
+        let age: u8 = age.trim().parse().expect("Wrong number");
+
+        println!("User was created");
+
+        self.first_name = first_name;
+        self.last_name = last_name;
+        self.male = male;
+        self.age = age;
+        self.is_blank = false;
+
     }
 }
 
 
-fn update_user (user: &mut UserDefinition) {
+impl UserDefinition {
+    fn update_user (&mut self) {
 
-    if user.is_blank {
-        println!("User was not created");
-        return;
+        if self.is_blank {
+            println!("User was not created");
+            return;
+        }
+
+        println!("Change INFO or press ENTER to use current \n");
+        let (first_name, last_name, male, age) = self::get_user_input();
+
+        self.first_name = if first_name == "\n" { self.first_name.clone() } else { first_name };
+        self.last_name = if last_name == "\n" { self.last_name.clone() } else { last_name } ;
+        self.male = if male == "\n" { self.male.clone() } else { male } ;
+        self.age = if age == "\n" { self.age.clone() } else { age.trim().parse().expect("Wrong number") };
     }
+}
+    
 
-    println!("Change INFO or press ENTER to use current \n");
-    let (first_name, last_name, male, age) = get_user_input();
-
-    user.first_name = if first_name == "\n" { user.first_name.clone() } else { first_name };
-    user.last_name = if last_name == "\n" { user.last_name.clone() } else { last_name } ;
-    user.male = if male == "\n" { user.male.clone() } else { male } ;
-    user.age = if age == "\n" { user.age.clone() } else { age.trim().parse().expect("Wrong number") };
+impl UserDefinition {
+    fn get_user_info(& self) {
+        if self.is_blank {
+            println!("User was not created, please called CREATE command");
+        } else {
+            println!(
+                "User Info:\n \nFIRST NAME:{}\nLAST NAME:{}\nMALE:{}\nAGE:{}\n"
+                , self.first_name, self.last_name, self.male, self.age
+                );
+            }
+        }
 }
 
 
-fn get_user_info(user: &UserDefinition) {
-    if user.is_blank {
-        println!("User was not created, please called CREATE command");
-    } else {
-        println!(
-            "User Info:\n \nFIRST NAME:{}\nLAST NAME:{}\nMALE:{}\nAGE:{}\n"
-            , user.first_name, user.last_name, user.male, user.age
-        );
+impl UserDefinition {
+    fn create_blank_user () -> UserDefinition {
+        UserDefinition {
+            first_name: String::from(""),
+            last_name: String::from(""),
+            male:  String::from("UNKOWN"),
+            age: 0,
+            is_blank: true,
+        }
     }
 }
 
 
-fn create_blank_user () -> UserDefinition {
-    UserDefinition {
-        first_name: String::from(""),
-        last_name: String::from(""),
-        male: String::from("UNKOWN"),
-        age: 0,
-        is_blank: true
+struct Commands {
+    user_create: String,
+    user_update: String,
+    user_info: String,
+    coomands: String,
+    exit: String 
+}
+
+
+impl Commands {
+    fn get_list_commands(&self) {
+        println!("Create User command: {}", self.user_create);
+        println!("Update User command: {}", self.user_update);
+        println!("Ger User info command: {}", self.user_info);
+        println!("Get List Commands command: {}", self.coomands);
+        println!("Shut down Application command {}", self.exit);
+    }
+}
+
+
+impl Commands {
+    fn set_application_commands() -> Commands {
+        Commands {
+            user_create: String::from("CREATE"),
+            user_update: String::from("UPDATE"),
+            user_info: String::from("INFO"),
+            coomands: String::from("COMMANDS"),
+            exit: String::from("EXIT"),
+        }
     }
 }
 
 
 fn main() {
     
-    let commands: Commands = set_application_commands();
+    // let commands: Commands = set_application_commands();
 
-    let mut user: UserDefinition = create_blank_user(); 
+    let commands: Commands = Commands::set_application_commands();
+
+    let mut user: UserDefinition = UserDefinition::create_blank_user(); 
 
     println!("Application was started");
 
@@ -154,14 +174,14 @@ fn main() {
 
             }
 
-            user = create_user();
+            user.create_user();
 
         } else if command == commands.user_update {
-            update_user(&mut user);
+            user.update_user();
         } else if command == commands.user_info {
-            get_user_info(&user);            
+            user.get_user_info();            
         } else if command == commands.coomands {
-            get_list_commands(&commands);
+            commands.get_list_commands();
         } else if command == commands.exit {
             break;
         }
