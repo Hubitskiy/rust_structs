@@ -144,8 +144,6 @@ impl Commands {
 
 
 fn main() {
-    
-    // let commands: Commands = set_application_commands();
 
     let commands: Commands = Commands::set_application_commands();
 
