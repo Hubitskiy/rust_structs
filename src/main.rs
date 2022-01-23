@@ -110,43 +110,41 @@ impl UserDefinition {
 }
 
 
-struct Commands {
-    user_create: String,
-    user_update: String,
-    user_info: String,
-    coomands: String,
-    exit: String 
+enum Commands {
+    CREATE,
+    UPDATE,
+    INFO,
+    EXIT,
+    NOTALLOWED
 }
 
 
 impl Commands {
-    fn get_list_commands(&self) {
-        println!("Create User command: {}", self.user_create);
-        println!("Update User command: {}", self.user_update);
-        println!("Ger User info command: {}", self.user_info);
-        println!("Get List Commands command: {}", self.coomands);
-        println!("Shut down Application command {}", self.exit);
-    }
-}
+    fn get_user_command_imput() -> Commands {
 
+        let mut command: String = String::new();
 
-impl Commands {
-    fn set_application_commands() -> Commands {
-        Commands {
-            user_create: String::from("CREATE"),
-            user_update: String::from("UPDATE"),
-            user_info: String::from("INFO"),
-            coomands: String::from("COMMANDS"),
-            exit: String::from("EXIT"),
+            io::stdin()
+            .read_line(&mut command)
+            .expect("Failed to read command");
+
+        command = command.trim().parse().expect("Invalid Entering");
+
+        println!("Command: {}", command);
+
+        match command.as_str() {
+            "CREATE" => Commands::CREATE,
+            "UPDATE" => Commands::UPDATE,
+            "INFO" => Commands::INFO,
+            "EXIT" => Commands::EXIT,
+            _ => Commands::NOTALLOWED
         }
+
     }
 }
-
 
 fn main() {
-
-    let commands: Commands = Commands::set_application_commands();
-
+    
     let mut user: UserDefinition = UserDefinition::create_blank_user(); 
 
     println!("Application was started");
@@ -154,39 +152,16 @@ fn main() {
     loop {
         println!("Enter a command:");
 
-        let mut command: String = String::new();
+        let command: Commands = Commands::get_user_command_imput(); 
 
-        io::stdin()
-            .read_line(&mut command)
-            .expect("Failed to read command");
-        
-        command = command.trim().parse().expect("Invalid Entering");
-        
-        println!("Command: {}", command);
-
-        if command == commands.user_create {
-
-            if user.is_blank == false {
-                println!("User already created");
-                continue;
-
-            }
-
-            user.create_user();
-
-        } else if command == commands.user_update {
-            user.update_user();
-        } else if command == commands.user_info {
-            user.get_user_info();            
-        } else if command == commands.coomands {
-            commands.get_list_commands();
-        } else if command == commands.exit {
-            break;
+        match command {
+            Commands::CREATE => user.create_user(),
+            Commands::UPDATE => user.update_user(),
+            Commands::INFO => user.get_user_info(),
+            Commands::EXIT => break,
+            Commands::NOTALLOWED => println!("Command not allowed")
         }
-        else {
-            println!("Invalid command was entered {}", command)
-        }
+
+        println!("Programm Shutdown")
     }
-
-    println!("Programm Shutdown")
 }
